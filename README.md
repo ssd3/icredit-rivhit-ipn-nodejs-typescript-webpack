@@ -1,7 +1,5 @@
 # ICredit Rivhit payment gateway integration for Node.JS / Typescript / Apollo Express Server / GraphQL
 
-![alt text](https://github.com/ssd3/icredit-rivhit-ipn-nodejs-typescript-webpack/blob/master/graphql-icredit-rivhit.png)
-
 ```
 git clone 
 
@@ -84,3 +82,4 @@ _variables:_
   "custom2": "0"
 }
 ```
+![alt text](https://github.com/ssd3/icredit-rivhit-ipn-nodejs-typescript-webpack/blob/master/graphql-icredit-rivhit.png)
