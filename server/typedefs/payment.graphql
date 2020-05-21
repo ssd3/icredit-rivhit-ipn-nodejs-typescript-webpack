@@ -1,0 +1,61 @@
+input PaymentItemInput {
+    Id: Int
+    CatalogNumber: String
+    Quantity: Float! = 0.0
+    UnitPrice: Float! = 0.0
+    Description: String
+}
+
+input PaymentRequestInput {
+    GroupPrivateToken: String
+    Items: [PaymentItemInput!]!
+    Currency: Int = 1
+    NumberOfPayments: Int
+    SaleType: Int
+    RedirectURL: String
+    FailRedirectURL: String
+    IPNURL: String
+    ExemptVAT: Boolean
+    MaxPayments: Int
+    CreditFromPayment: Int
+    Reference: Int
+    Order: String
+    EmailAddress: String
+    EmailBcc: String
+    CustomerLastName: String
+    CustomerFirstName: String
+    Address: String
+    POB: Int
+    City: String
+    Zipcode: Int
+    PhoneNumber: String
+    PhoneNumber2: String
+    FaxNumber: String
+    IdNumber: Int
+    VatNumber: Int
+    CustomerId: Int
+    AgentId: Int
+    Comments: String
+    ProjectId: Int
+    HideItemList: Boolean
+    DocumentLanguage: String = "en"
+    CreateToken: String
+    Discount: Float
+    Custom1: String
+    Custom2: String
+    Custom3: String
+    Custom4: String
+    Custom5: String
+    Custom6: String
+    Custom7: String
+    Custom8: String
+    Custom9: String
+}
+
+type PaymentResponse {
+    URL: String
+}
+
+type Query {
+    getUrl(input: PaymentRequestInput): PaymentResponse
+}

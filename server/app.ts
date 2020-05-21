@@ -1,18 +1,22 @@
+import { ApolloServer } from 'apollo-server-express'
 import compression from 'compression'
 import express from 'express'
 import * as bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
+import depthLimit from 'graphql-depth-limit'
 import IController from './interfaces/IController'
 import errorMiddleware from './middleware/error'
 import cors from 'cors'
 import path from 'path'
 import favicon from 'serve-favicon'
+import schema from './schema'
 
 /**
  * Express application class
  */
 export class App {
     public app: express.Application
+    public apolloServer: ApolloServer
     public httpServer: any
 
     /**
@@ -24,6 +28,7 @@ export class App {
         this.initializeMiddleware()
         this.initializeControllers(controllers)
         this.initializeErrorHandling()
+        this.apolloServer = this.initializeApolloServer()
     }
 
     /**
@@ -33,6 +38,7 @@ export class App {
         this.httpServer = this.app.listen(process.env.PORT,
             () => {
                 console.log(`ICredit Rivhit IPN available at: http://${process.env.HOST}:${process.env.PORT}/payment/rivhit/ipn`)
+                console.log(`🚀GraphQL http://${process.env.HOST}:${process.env.PORT}${this.apolloServer.graphqlPath}`)
         })
     }
 
@@ -41,6 +47,13 @@ export class App {
      */
     public getApp() {
         return this.app
+    }
+
+    /**
+     * Get Apollo Graphql server instance
+     */
+    public getApolloServer() {
+        return this.apolloServer
     }
 
     /**
@@ -82,5 +95,39 @@ export class App {
         controllers.forEach((controller) => {
             this.app.use('/', controller.router)
         })
+    }
+
+    /**
+     * Init Apollo GraphQL server
+     */
+    private initializeApolloServer() {
+        const apolloServer = new ApolloServer({
+            debug: process.env.APOLLO_SERVER_DEBUG === 'true',
+            introspection: process.env.APOLLO_SERVER_INTROSPECTION === 'true',
+            formatError: (error) => {
+                return new Error(error.message)
+            },
+            schema,
+            validationRules: [depthLimit(7)],
+            context: async ({ req, connection }) => {
+                if (connection) {
+                    return connection.context
+                } else {
+                    return {
+                        userId: '',
+                        isSuperuser: true,
+                        groups: []
+                    }
+                }
+            }
+        })
+
+        apolloServer.applyMiddleware
+        ({
+            app: this.app,
+            path: '/graphql'
+        })
+
+        return apolloServer
     }
 }
